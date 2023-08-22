@@ -2,12 +2,8 @@ version: '3.9'
 
 services:
   api1: &api
-    build: .
+    image: leandronsp/rinha-backend-bash
     container_name: api1
-    working_dir: /app
-    command: bash app.bash
-    volumes:
-      - .:/app
     depends_on:
       - postgres
 
@@ -35,6 +31,3 @@ services:
       - api2
     ports:
       - 9999:9999
-
-volumes:
-  aptcache:

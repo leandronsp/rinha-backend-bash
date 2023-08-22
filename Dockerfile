@@ -5,4 +5,4 @@ WORKDIR /app
 COPY . .
 
 EXPOSE 3000
-CMD ["bash app.bash"]
+CMD ["bash", "app.bash"]
