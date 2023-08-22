@@ -5,7 +5,7 @@ function handle_POST_create() {
     QUERY="
 WITH data AS (
   SELECT
-    json_array_elements('$BODY'::json) AS item
+    '$BODY'::json AS item
 )
 INSERT INTO people (id, name, nickname, birth_date, stack)
 SELECT
@@ -13,10 +13,17 @@ SELECT
   item->>'nome',
   item->>'apelido',
   to_date(item->>'nascimento', 'YYYY-MM-DD'),
-  ARRAY(SELECT json_array_elements_text(item->'stack'))
+  ARRAY[item->>'stack']
 FROM data"
 
     psql -t -h postgres -U postgres -d postgres -c "$QUERY"
+    PSQL_STATUS=$?
+
+    if [ $PSQL_STATUS -ne 0 ]; then
+      RESPONSE=$(cat views/422.http)
+      return
+    fi
+
     RESPONSE=$(cat views/201.http | sed "s/{{uuid}}/$UUID/")
   fi
 }

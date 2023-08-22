@@ -1,6 +1,11 @@
 function handle_GET_search() {
   SEARCH_TERM=${PARAMS["term"]}
 
+  if [ -z "$SEARCH_TERM" ]; then
+    RESPONSE=$(cat views/400.http)
+    return
+  fi
+
   if [ ! -z "$SEARCH_TERM" ]; then
     QUERY="
 SELECT json_agg(row_to_json(t))
