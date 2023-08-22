@@ -1,6 +1,6 @@
 # rinha-backend-bash
 
-Versão Bash da [rinha do backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) (under construction)
+Versão Bash da [rinha do backend](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) 
 
 ## Requisitos
 
