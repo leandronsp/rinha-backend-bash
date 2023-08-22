@@ -1,29 +1,47 @@
 #!/bin/bash
 
+PID=$$ 
+
 ## Create the response FIFO
-FIFO_PATH=/tmp/response
+mkdir -p /tmp/pid-$PID
+FIFO_PATH=/tmp/pid-$PID/response
 rm -f $FIFO_PATH
 mkfifo $FIFO_PATH
 
-function handle_GET_hello() {
-  RESPONSE=$(cat views/hello.jsonr)
-  echo $RESPONSE
-}
+declare -A params
 
 function handleRequest() {
   ## Read the HTTP request until \r\n
   while read line; do
-    echo $line
+    #echo $line
     trline=$(echo $line | tr -d '[\r\n]') ## Removes the \r\n from the EOL
 
     ## Breaks the loop when line is empty
     [ -z "$trline" ] && break
 
     ## Parses the headline
-    ## e.g GET /login HTTP/1.1 -> GET /login
+    ## e.g GET /contagem-pessoas HTTP/1.1 -> GET /contagem-pessoas
     HEADLINE_REGEX='(.*?)\s(.*?)\sHTTP.*?'
-    [[ "$trline" =~ $HEADLINE_REGEX ]] &&
+
+    if [[ "$trline" =~ $HEADLINE_REGEX ]]; then
       REQUEST=$(echo $trline | sed -E "s/$HEADLINE_REGEX/\1 \2/")
+      echo $REQUEST
+      
+      ## Parses the query string
+      QUERY_STRING_REGEX='(.*?)\?t=(.*)'
+      if [[ "$REQUEST" =~ $QUERY_STRING_REGEX ]]; then
+        PARAMS["term"]=$(echo $REQUEST | sed -E "s/$QUERY_STRING_REGEX/\2/")
+        REQUEST=$(echo $REQUEST | sed -E "s/$QUERY_STRING_REGEX/\1/")
+      fi
+
+      ## Parses the path parameter (UUID)
+      # e.g GET /pessoas/123e4567 HTTP/1.1 -> GET /pessoas/:id -> 123e4567
+      PATH_PARAMETER_REGEX='(.*?\s\/.*?)\/(.*?)$'
+      if [[ "$REQUEST" =~ $PATH_PARAMETER_REGEX ]]; then
+        PARAMS["id"]=$(echo $REQUEST | sed -E "s/$PATH_PARAMETER_REGEX/\2/")
+        REQUEST=$(echo $REQUEST | sed -E "s/$PATH_PARAMETER_REGEX/\1\/:id/")
+      fi
+    fi
 
     ## Parses the Content-Length header
     ## e.g Content-Length: 42 -> 42
@@ -40,22 +58,12 @@ function handleRequest() {
 
   ## Read the remaining HTTP request body
   if [ ! -z "$CONTENT_LENGTH" ]; then
-    BODY_REGEX='(.*?)=(.*?)'
-
-    while read -n$CONTENT_LENGTH -t1 line; do
-      #echo $line
-      trline=`echo $line | tr -d '[\r\n]'`
-
-      [ -z "$trline" ] && break
-
-      read INPUT_NAME INPUT_VALUE <<< $(echo $trline | sed -E "s/$BODY_REGEX/\1 \2/")
-    done
+    read -n$CONTENT_LENGTH BODY
+    BODY=$(echo "$BODY" | tr -d '[\r\n]')
   fi
 
   ## Route request to the response handler
-  case "$REQUEST" in
-    "GET /hello")   handle_GET_hello ;;
-  esac
+  source ./app/routes.bash
 
   echo -e "$RESPONSE" > $FIFO_PATH
 }

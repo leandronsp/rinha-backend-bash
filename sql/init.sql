@@ -1,3 +1,11 @@
+-- Create extensions
+CREATE EXTENSION pg_trgm;
+
+-- Create function array to string immutable
+CREATE OR REPLACE FUNCTION array_ts(arr TEXT[])
+RETURNS TEXT IMMUTABLE LANGUAGE SQL AS $$
+SELECT array_to_string(arr, ' ') $$;
+
 -- Create table people
 CREATE TABLE IF NOT EXISTS people (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -7,21 +15,6 @@ CREATE TABLE IF NOT EXISTS people (
     stack VARCHAR(32)[]
 );
 
--- Create function array to string immutable
-CREATE OR REPLACE FUNCTION array_ts(arr TEXT[])
-RETURNS TEXT IMMUTABLE LANGUAGE SQL AS $$
-SELECT array_to_string(arr, ' ') $$;
-
--- Configure text search
-CREATE EXTENSION unaccent;
-ALTER TEXT SEARCH DICTIONARY unaccent (RULES = 'unaccent');
-CREATE TEXT SEARCH CONFIGURATION pt_en_unaccent (COPY = portuguese);
-
-ALTER TEXT SEARCH CONFIGURATION pt_en_unaccent 
-ALTER MAPPING FOR hword, hword_part, word 
-WITH unaccent, portuguese_stem, english_stem;
-
-CREATE INDEX people_search_idx 
-ON people 
-USING GIN 
-(to_tsvector('pt_en_unaccent', array_ts(stack || ARRAY[name, nickname])));
+-- Create search index
+CREATE INDEX people_search_idx ON people 
+USING GIN (array_ts(stack || ARRAY[name, nickname]) gin_trgm_ops);

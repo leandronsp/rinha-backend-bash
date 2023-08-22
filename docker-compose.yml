@@ -2,14 +2,12 @@ version: '3.9'
 
 services:
   api1:
-    build:
-      context: .
-    hostname: api1
+    build: .
     container_name: api1
     working_dir: /app
+    command: bash app.bash
     ports:
       - 3000:3000
-    command: bash app.bash
     volumes:
       - .:/app
     depends_on:
@@ -18,6 +16,8 @@ services:
   postgres:
     image: postgres
     container_name: postgres
+    ports:
+      - 5432:5432
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
