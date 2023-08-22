@@ -2,8 +2,11 @@ version: '3.9'
 
 services:
   api1: &api
-    image: leandronsp/rinha-backend-bash
+    #image: leandronsp/rinha-backend-bash
+    build: .
     container_name: api1
+    volumes:
+      - .:/app
     depends_on:
       - postgres
 
@@ -19,13 +22,13 @@ services:
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   nginx:
     image: nginx 
     container_name: nginx
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - api1
       - api2
