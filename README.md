@@ -4,10 +4,11 @@ Versão Bash da [rinha do backend](https://github.com/zanfranceschi/rinha-de-bac
 
 ## Requisitos
 
-* Bash (não precisa instalar, você provavelmente já deve ter um casa)
+* Bash 
 * [Docker](https://docs.docker.com/get-docker/)
 * [curl](https://curl.se/download.html)
 * [Gatling](https://gatling.io/open-source/), a performance testing tool
+* _Maizena_
 
 ## Stack
 
