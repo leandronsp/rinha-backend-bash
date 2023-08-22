@@ -9,6 +9,12 @@ services:
       - .:/app
     depends_on:
       - postgres
+      - pgbouncer
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '1GB'
 
   api2: 
     <<: *api
@@ -23,6 +29,34 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: postgres - "shared_buffers=256MB" -c "max_connections=300"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '1GB'
+
+  pgbouncer:
+    image: pgbouncer/pgbouncer
+    hostname: pgbouncer
+    container_name: pgbouncer
+    environment:
+      - DATABASES_HOST=postgres
+      - DATABASES_PORT=5432
+      - DATABASES_USER=postgres
+      - DATABASES_PASSWORD=postgres
+      - DATABASES_DBNAME=postgres
+      - DATABASES_POOL_SIZE=20
+      - PGBOUNCER_MAX_CLIENT_CONN=100
+      - PGBOUNCER_RESERVE_POOL_SIZE=50
+      - PGBOUNCER_DEFAULT_POOL_SIZE=50
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '0.5GB'
 
   nginx:
     image: nginx 
@@ -34,3 +68,8 @@ services:
       - api2
     ports:
       - 9999:9999
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '0.5GB'

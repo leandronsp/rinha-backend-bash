@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS people (
     name VARCHAR(100) NOT NULL,
     nickname VARCHAR(32) UNIQUE NOT NULL,
     birth_date DATE NOT NULL,
-    stack VARCHAR(32)[]
+    stack TEXT[]
 );
 
 -- Create search index

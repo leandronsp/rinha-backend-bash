@@ -16,14 +16,13 @@ SELECT
   ARRAY[item->>'stack']
 FROM data"
 
-    psql -t -h postgres -U postgres -d postgres -c "$QUERY"
+    psql -t -h pgbouncer -U postgres -d postgres -p 6432 -c "$QUERY" >&2
     PSQL_STATUS=$?
 
     if [ $PSQL_STATUS -ne 0 ]; then
       RESPONSE=$(cat views/422.http)
-      return
+    else
+      RESPONSE=$(cat views/201.http | sed "s/{{uuid}}/$UUID/")
     fi
-
-    RESPONSE=$(cat views/201.http | sed "s/{{uuid}}/$UUID/")
   fi
 }
