@@ -20,7 +20,7 @@ FROM (
     WHERE name ILIKE '%$SEARCH_TERM%'
 ) t"
 
-    RESULT=`psql -t -h postgres -U postgres -d postgres -c "$QUERY" | tr -d '[:space:]'` 
+    RESULT=`psql -t -h pgbouncer -U postgres -d postgres -p 6432 -c "$QUERY" | tr -d '[:space:]'` 
 
     if [ ! -z "$RESULT" ]; then
       RESPONSE=$(cat views/search.jsonr | sed "s/{{data}}/$RESULT/")

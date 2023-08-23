@@ -16,7 +16,7 @@ SELECT
   ARRAY[item->>'stack']
 FROM data"
 
-    psql -t -h postgres -U postgres -d postgres -c "$QUERY"
+    psql -t -h pgbouncer -U postgres -d postgres -p 6432 -c "$QUERY"
     PSQL_STATUS=$?
 
     if [ $PSQL_STATUS -ne 0 ]; then

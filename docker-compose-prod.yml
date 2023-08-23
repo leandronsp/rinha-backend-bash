@@ -2,12 +2,10 @@ version: '3.9'
 
 services:
   api1: &api
-    build: .
+    image: leandronsp/rinha-backend-bash
     container_name: api1
     depends_on:
       - postgres
-    volumes:
-      - .:/app
     deploy:
       resources:
         limits:
