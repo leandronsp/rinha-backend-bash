@@ -18,6 +18,7 @@ FROM (
       stack
     FROM people 
     WHERE name ILIKE '%$SEARCH_TERM%'
+    LIMIT 50
 ) t"
 
     RESULT=`psql -t -h pgbouncer -U postgres -d postgres -p 6432 -c "$QUERY" | tr -d '[:space:]'` 
