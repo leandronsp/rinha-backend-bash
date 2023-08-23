@@ -17,7 +17,7 @@ FROM (
       birth_date as nascimento,
       stack
     FROM people 
-    WHERE name ILIKE '%$SEARCH_TERM%'
+    WHERE search LIKE '%$SEARCH_TERM%'
     LIMIT 50
 ) t"
 
