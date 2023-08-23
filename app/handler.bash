@@ -17,7 +17,7 @@ function handleRequest() {
 
     if [[ "$trline" =~ $HEADLINE_REGEX ]]; then
       REQUEST=$(echo $trline | sed -E "s/$HEADLINE_REGEX/\1 \2/")
-      echo $REQUEST
+      echo $REQUEST >&2
       
       ## Parses the query string
       QUERY_STRING_REGEX='(.*?)\?t=(.*)'
@@ -69,5 +69,7 @@ function handleRequest() {
     *)                       handle_not_found ;;
   esac
 
-  echo -e "$RESPONSE" > $FIFO_PATH
+  echo -e "$RESPONSE"
 }
+
+handleRequest

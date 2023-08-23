@@ -6,13 +6,14 @@ services:
     container_name: api1
     depends_on:
       - postgres
+      - pgbouncer
     volumes:
       - .:/app
-    command: bash netcat.bash
+    command: bash socat.bash
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: '0.25'
           memory: '0.5GB'
 
   api2: 
@@ -32,7 +33,7 @@ services:
       resources:
         limits:
           cpus: '0.8'
-          memory: '0.5GB'
+          memory: '1GB'
 
   pgbouncer:
     image: pgbouncer/pgbouncer
@@ -45,7 +46,7 @@ services:
       - DATABASES_PASSWORD=postgres
       - DATABASES_DBNAME=postgres
       - DATABASES_POOL_SIZE=20
-      - PGBOUNCER_MAX_CLIENT_CONN=100
+      - PGBOUNCER_MAX_CLIENT_CONN=30
       - PGBOUNCER_RESERVE_POOL_SIZE=50
       - PGBOUNCER_DEFAULT_POOL_SIZE=50
     depends_on:
@@ -53,8 +54,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: '0.5GB'
+          cpus: '0.1'
+          memory: '0.3GB'
 
   nginx:
     image: nginx 
@@ -69,5 +70,5 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.2'
+          cpus: '0.1'
           memory: '0.3GB'

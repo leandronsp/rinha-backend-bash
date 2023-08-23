@@ -8,13 +8,13 @@ SELECT array_to_string(arr, ' ') $$;
 
 -- Create table people
 CREATE TABLE IF NOT EXISTS people (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     nickname VARCHAR(32) UNIQUE NOT NULL,
     birth_date DATE NOT NULL,
-    stack VARCHAR(32)[]
+    stack TEXT[]
 );
 
 -- Create search index
 CREATE INDEX people_search_idx ON people 
-USING GIN (array_ts(stack || ARRAY[name, nickname]) gin_trgm_ops);
+USING GIST (array_ts(stack || ARRAY[name, nickname]) gist_trgm_ops);
