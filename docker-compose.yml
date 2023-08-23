@@ -8,6 +8,7 @@ services:
       - postgres
     volumes:
       - .:/app
+    command: bash netcat.bash
     deploy:
       resources:
         limits:

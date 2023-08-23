@@ -18,7 +18,7 @@ stress.it: ## Run stress tests
 	@sh stress-test/run-test.sh
 
 docker.build: ## Build the docker image
-	@docker build -t leandronsp/rinha-backend-bash .
+	@docker build -t leandronsp/rinha-backend-bash -f Dockerfile.prod .
 
 docker.push: ## Push the docker image
 	@docker push leandronsp/rinha-backend-bash
