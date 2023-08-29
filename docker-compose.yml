@@ -2,7 +2,9 @@ version: '3.9'
 
 services:
   api1: &api
-    build: .
+    build: 
+      context: .
+      target: base
     container_name: api1
     depends_on:
       - postgres
