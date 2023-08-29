@@ -9,7 +9,7 @@ services:
       - pgbouncer
     volumes:
       - .:/app
-    command: bash socat.bash
+    command: bash netcat.bash
     deploy:
       resources:
         limits:
@@ -45,10 +45,10 @@ services:
       - DATABASES_USER=postgres
       - DATABASES_PASSWORD=postgres
       - DATABASES_DBNAME=postgres
-      - DATABASES_POOL_SIZE=20
-      - PGBOUNCER_MAX_CLIENT_CONN=30
-      - PGBOUNCER_RESERVE_POOL_SIZE=50
-      - PGBOUNCER_DEFAULT_POOL_SIZE=50
+      - DATABASES_POOL_SIZE=100
+      - PGBOUNCER_MAX_CLIENT_CONN=100
+      - PGBOUNCER_RESERVE_POOL_SIZE=100
+      - PGBOUNCER_DEFAULT_POOL_SIZE=100
     depends_on:
       - postgres
     deploy:

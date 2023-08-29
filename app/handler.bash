@@ -69,7 +69,5 @@ function handleRequest() {
     *)                       handle_not_found ;;
   esac
 
-  echo -e "$RESPONSE"
+  echo -e "$RESPONSE" > $FIFO_PATH
 }
-
-handleRequest
