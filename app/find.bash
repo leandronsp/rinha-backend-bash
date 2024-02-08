@@ -1,7 +1,7 @@
 function handle_GET_find() {
-  UUID=${PARAMS["id"]}
+  UUID="${PARAMS["id"]}"
 
-  if [ ! -z "$UUID" ]; then
+  [[ ! -z "${UUID}" ]] && {
     QUERY="
 SELECT json_agg(row_to_json(t))
 FROM (
@@ -12,15 +12,15 @@ FROM (
       birth_date as nascimento,
       stack
     FROM people 
-    WHERE id = '$UUID'
+    WHERE id = '${UUID}'
 ) t"
 
-    RESULT=`psql -t -h pgbouncer -U postgres -d postgres -p 6432 -c "$QUERY" | tr -d '[:space:]'` 
+    RESULT="$(psql -t -h pgbouncer -U postgres -d postgres -p 6432 -c "$QUERY" | tr -d '[:space:]')"
 
-    if [ ! -z "$RESULT" ]; then
-      RESPONSE=$(cat views/find.jsonr | sed "s/{{data}}/$RESULT/")
-    else
-      RESPONSE=$(cat views/find-not-found.jsonr)
-    fi
-  fi
+    [[ ! -z "${RESULT}" ]] && {
+      RESPONSE=$(sed "s/{{data}}/${RESULT}/" <<< "$(< "views/find.jsonr")")
+    }||{
+      RESPONSE=$(< "views/find-not-found.jsonr")
+    }
+  }
 }
