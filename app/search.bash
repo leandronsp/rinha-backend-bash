@@ -1,12 +1,12 @@
 function handle_GET_search() {
-  SEARCH_TERM=${PARAMS["term"]}
+  SEARCH_TERM="${PARAMS["term"]}"
 
-  if [ -z "$SEARCH_TERM" ]; then
-    RESPONSE=$(cat views/400.http)
+  [[ -z "${SEARCH_TERM}" ]] && {
+    RESPONSE="$(< views/400.http)"
     return
-  fi
+  }
 
-  if [ ! -z "$SEARCH_TERM" ]; then
+  [[ ! -z "${SEARCH_TERM}" ]] && {
     QUERY="
 SELECT json_agg(row_to_json(t))
 FROM (
@@ -17,16 +17,16 @@ FROM (
       birth_date as nascimento,
       stack
     FROM people 
-    WHERE search LIKE '%$SEARCH_TERM%'
+    WHERE search LIKE '%${SEARCH_TERM}%'
     LIMIT 50
 ) t"
 
-    RESULT=`psql -t -h pgbouncer -U postgres -d postgres -p 6432 -c "$QUERY" | tr -d '[:space:]'` 
+    RESULT="$(psql -t -h pgbouncer -U postgres -d postgres -p 6432 -c "${QUERY}" | tr -d '[:space:]')"
 
-    if [ ! -z "$RESULT" ]; then
-      RESPONSE=$(cat views/search.jsonr | sed "s/{{data}}/$RESULT/")
-    else
-      RESPONSE=$(cat views/search-no-results.jsonr)
-    fi
-  fi
+    [[ ! -z "${RESULT}" ]] && {
+      RESPONSE=$(sed "s/{{data}}/${RESULT}/" <<< $(< "views/search.jsonr"))
+    } || {
+      RESPONSE="$(< "views/search-no-results.jsonr")"
+    }
+  }
 }
